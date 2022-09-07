@@ -34,10 +34,13 @@ public class TestController {
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @RequestMapping("/GetUserFromDB")
-    public List GetUserFromDB() {
+    public Object GetUserFromDB() {
         String sql = "select  * from user";
+        System.out.println(jdbcTemplate.queryForList(sql));
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
-        return list;
+        HashMap<String, Object> result = new HashMap<String, Object>();
+        System.out.println(list.isEmpty());
+        return  getResult(result, (list == null || list.isEmpty()) ? 0 : 1,list);
     }
 
     /**
@@ -49,23 +52,24 @@ public class TestController {
 //    private  JdbcTemplate jdbcTemplate;
     @RequestMapping("/AddUser")
     public Object AddUser (String name, Number age, String sex) {
-
         String sql = "insert into user (name, age, sex) values (?,?,?);";
         HashMap<String, Object> result = new HashMap<String, Object>();
         int res = jdbcTemplate.update(sql, name, age, sex);
-        return getResult(result, res);
+        return getResult(result, res, null);
     }
 
-    private Object getResult(HashMap<String, Object> result, int res) {
+    private Object getResult(HashMap<String, Object> result, int res, List list) {
         if(res > 0) {
             result.put("code", 200);
-            result.put("msg", "成功");
+            result.put("msg", "操作成功");
         }
         if(res < 0) {
             result.put("code", 0);
-            result.put("msg", "失败");
+            result.put("msg", "操作失败");
         }
-        System.out.println(result);
+        if(list != null && !list.isEmpty()) {
+            result.put("list", list);
+        }
         return result;
     }
 
@@ -79,7 +83,7 @@ public class TestController {
         String sql = "DELETE  FROM  user WHERE name=?;";
         HashMap<String, Object> result = new HashMap<String, Object>();
         int res = jdbcTemplate.update(sql, name);
-        return getResult(result, res);
+        return getResult(result, res, null);
 
     }
 }

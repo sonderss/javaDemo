@@ -39,9 +39,8 @@ public class TestController {
         String sql = "select  * from user";
         System.out.println(jdbcTemplate.queryForList(sql));
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
-        HashMap<String, Object> result = new HashMap<String, Object>();
         System.out.println(list.isEmpty());
-        return  getResult(result, (list == null || list.isEmpty()) ? 0 : 1,list);
+        return  getResult((list == null || list.isEmpty()) ? 0 : 1,list);
     }
 
     /** 添加用户 */
@@ -50,19 +49,18 @@ public class TestController {
     @RequestMapping("/AddUser")
     public Object AddUser (String name, Number age, String sex) {
         String sql = "insert into user (name, age, sex) values (?,?,?);";
-        HashMap<String, Object> result = new HashMap<String, Object>();
         int res = jdbcTemplate.update(sql, name, age, sex);
-        return getResult(result, res, null);
+        return getResult(res, null);
     }
 
     /**
      * 封装的结果返回方法
-     * @param result 创建的JSON对象
      * @param res    是否成功
      * @param list   返回的数据
      * */
 
-    private Object getResult(HashMap<String, Object> result, int res, List list) {
+    private Object getResult(int res, List list) {
+        HashMap<String, Object> result = new HashMap<String, Object>();
         if(res > 0) {
             result.put("code", 200);
             result.put("msg", "操作成功");
@@ -81,9 +79,8 @@ public class TestController {
     @RequestMapping("/DelUser")
     public  Object DelUser(String name) {
         String sql = "DELETE  FROM  user WHERE name=?;";
-        HashMap<String, Object> result = new HashMap<String, Object>();
         int res = jdbcTemplate.update(sql, name);
-        return getResult(result, res, null);
+        return getResult(res, null);
 
     }
 }

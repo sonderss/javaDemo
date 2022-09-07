@@ -31,6 +31,7 @@ public class TestController {
         return userList;
     }
 
+    /** 用户列表查询 */
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @RequestMapping("/GetUserFromDB")
@@ -43,11 +44,7 @@ public class TestController {
         return  getResult(result, (list == null || list.isEmpty()) ? 0 : 1,list);
     }
 
-    /**
-     * 添加用户
-     * @param name
-     * @return code 200 成功 0 失败 msg 描述
-     */
+    /** 添加用户 */
 //    @Autowired
 //    private  JdbcTemplate jdbcTemplate;
     @RequestMapping("/AddUser")
@@ -57,6 +54,13 @@ public class TestController {
         int res = jdbcTemplate.update(sql, name, age, sex);
         return getResult(result, res, null);
     }
+
+    /**
+     * 封装的结果返回方法
+     * @param result 创建的JSON对象
+     * @param res    是否成功
+     * @param list   返回的数据
+     * */
 
     private Object getResult(HashMap<String, Object> result, int res, List list) {
         if(res > 0) {
@@ -73,11 +77,7 @@ public class TestController {
         return result;
     }
 
-    /**
-     * 删除用户
-     * @param name
-     * return true
-     */
+    /** 删除用户*/
     @RequestMapping("/DelUser")
     public  Object DelUser(String name) {
         String sql = "DELETE  FROM  user WHERE name=?;";

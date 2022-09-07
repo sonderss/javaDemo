@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加用户</title>
+    <script src="../js/jquery.js"></script>
+</head>
+<body>
+<label>用户名 <input id="name" type="text"/></label>
+<label>年龄 <input id="age" type="text"/></label>
+<label>性别   <input id="sex" type="text"/></label>
+<button id="btn">添加用户</button>
+
+<table id="table" style="margin: 20px" border="1" cellspacing="0" cellpadding="0">
+
+</table>
+</body>
+<script>
+    $(document).ready(function () {
+      function  getUser() {
+          $.ajax({
+              url: 'http://localhost:8080/user/GetUserFromDB',
+              success(res){
+                  console.log(res)
+                  let dom = `<tr>
+                            <th>名字</th>
+                            <th>年龄</th>
+                            <th>性别</th>
+                             <th>操作</th>
+                        </tr>`
+                  let item = ''
+                  for(let i=0; i<res.length;i++) {
+                      item += `
+                        <tr>
+                            <td>${res[i].name}</td>
+                            <td>${res[i].age}</td>
+                            <td>${res[i].sex}</td>
+                            <td> <button  data-name="${res[i].name}" class="index_${i}">删除</button></td>
+                        </tr>
+
+                      `
+                  }
+                  dom += item
+                  $("#table").html(dom)
+              }
+          })
+      }
+      function getInputValue () {
+          return {
+              name:  $("#name").val(),
+              age:  $("#age").val(),
+              sex:  $("#sex").val()
+          }
+      }
+
+        $("#table").on("click","button",(event) => {
+            const name = event.target.getAttribute("data-name")
+            delUser(name)
+        })
+      function  delUser(name) {
+          $.ajax({
+              url: 'http://localhost:8080/user/DelUser',
+              data:  {name},
+              success(res){
+                  console.log(res)
+                  if(res.code === 200) {
+                      return getUser()
+                  }
+                  return alert('删除数据失败')
+              }
+          })
+      }
+      function  clearValue() {
+          $("#name").val('')
+          $("#age").val('')
+          $("#sex").val('')
+          return
+      }
+
+      function  addUser () {
+          $.ajax({
+              url: 'http://localhost:8080/user/AddUser',
+              data:  getInputValue(),
+              success(res){
+                  console.log(res)
+                  if(res.code === 200) {
+                      return getUser()
+                  }
+                  return alert('插入数据失败')
+              }
+          })
+
+      }
+      // 获取用户数据
+      getUser()
+      $("#btn").click(() => {
+        addUser()
+        clearValue() // 清空输入框
+      })
+    })
+</script>
+</html>
